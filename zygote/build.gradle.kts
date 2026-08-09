@@ -35,15 +35,28 @@ kotlin {
 
 abstract class CopyManagerAppTask : DefaultTask() {
 
-    @get:InputFile
-    abstract val managerApk: RegularFileProperty
+    @get:Input
+    abstract val managerApkPath: Property<String>
+
+    @get:Input
+    abstract val injectedApkPath: Property<String>
 
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
     @TaskAction
     fun copyManagerApp() {
-        managerApk.get().asFile.copyTo(
+        var builtFile = project.file(managerApkPath.get())
+        if (!builtFile.exists()) {
+            val injectedFile = project.file(injectedApkPath.get())
+            if (injectedFile.exists()) {
+                builtFile = injectedFile
+            } else {
+                throw GradleException("The manager app (checked $builtFile and $injectedFile) is not built yet")
+            }
+        }
+
+        builtFile.copyTo(
             outputDir.get().file("manager.apk").asFile,
             overwrite = true,
         )
@@ -105,15 +118,15 @@ androidComponents {
         val variantCapped = variant.name.replaceFirstChar { it.titlecase(Locale.ROOT) }
         val variantLowered = variant.name.lowercase(Locale.ROOT)
 
-        val managerApkFile = rootProject.layout.projectDirectory.file(
-            "app/build/outputs/apk/$variantLowered/${rootProject.name}-$appVerName-$variantLowered.apk"
-        )
+        val apkName = "${rootProject.name}-$appVerName-$variantLowered.apk"
+        val appBuildDir = rootProject.layout.projectDirectory.dir("app/build")
 
         val copyManagerApp = tasks.register<CopyManagerAppTask>("copy${variantCapped}ManagerApp") {
             description = "Copies the manager APK into the $variantLowered module assets"
 
             dependsOn(":app:assemble$variantCapped")
-            managerApk.set(managerApkFile)
+            managerApkPath.set(appBuildDir.file("outputs/apk/$variantLowered/$apkName").asFile.absolutePath)
+            injectedApkPath.set(appBuildDir.file("intermediates/apk/$variantLowered/$apkName").asFile.absolutePath)
         }
         variant.sources.assets?.addGeneratedSourceDirectory(
             copyManagerApp,
