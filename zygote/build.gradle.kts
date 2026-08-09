@@ -81,13 +81,17 @@ afterEvaluate {
 }
 
 fun addManagerApp(variant: String) {
-    val builtFile = File(
-        layout.buildDirectory.get().asFile.toString().replace(project.name, "app"),
-        "outputs/apk/$variant/${rootProject.name}-${android.defaultConfig.versionName}-${variant}.apk",
-    )
+    val appBuildDir = layout.buildDirectory.get().asFile.toString().replace(project.name, "app")
+    val apkName = "${rootProject.name}-${android.defaultConfig.versionName}-${variant}.apk"
+    var builtFile = File(appBuildDir, "outputs/apk/$variant/$apkName")
 
     if (!builtFile.exists()) {
-        throw GradleException("The manager app for $variant ($builtFile) is not built yet")
+        val injectedFile = File(appBuildDir, "intermediates/apk/$variant/$apkName")
+        if (injectedFile.exists()) {
+            builtFile = injectedFile
+        } else {
+            throw GradleException("The manager app for $variant (checked $builtFile and $injectedFile) is not built yet")
+        }
     }
 
     builtFile.copyTo(
