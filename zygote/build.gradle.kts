@@ -44,6 +44,7 @@ afterEvaluate {
         val outSrc = outSrcDir.get().file("org/frknkrc44/hma_oss/zygote/Magic.java")
         val signInfoTask = tasks.register("generate${variantCapped}SignInfo") {
             description = "Generate signature info for verification"
+            dependsOn(":app:assemble${variantCapped}")
 
             outputs.file(outSrc)
             doLast {
@@ -73,6 +74,7 @@ afterEvaluate {
 
         val kotlinCompileTask = tasks.findByName("compile${variantCapped}Kotlin") as KotlinCompile
         kotlinCompileTask.dependsOn(signInfoTask)
+        tasks.findByName("generate${variantCapped}Assets")?.dependsOn(signInfoTask)
         val srcSet = objects.sourceDirectorySet("magic", "magic").srcDir(outSrcDir)
         kotlinCompileTask.source(srcSet)
     }
