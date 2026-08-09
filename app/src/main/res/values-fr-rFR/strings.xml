@@ -162,7 +162,7 @@
     <string name="settings_overwrite_summary">Les options de cette catégorie sont activées de force lorsque les cases sont cochées</string>
     <string name="settings_default_value">Valeur par défaut : %s</string>
     <string name="settings_data_isolation">Isolation des données</string>
-    <string name="settings_data_isolation_summary">Données des applications : %s\nDonnées vold des applications : %s\nMontage forcé : %s</string>
+    <string name="settings_data_isolation_summary">Données des applications : %1$s\nDonnées vold des applications : %2$s\nMontage forcé : %3$s</string>
     <string name="settings_data_isolation_unsupported">Option disponible uniquement à partir d\'Android 11</string>
     <string name="settings_app_data_isolation">Isolation des données d\'application</string>
     <string name="settings_vold_app_data_isolation">Isolation des données d\'application vold</string>
