@@ -117,15 +117,16 @@ tasks.register("clean", Delete::class) {
 }
 
 fun Project.createProvidedSigningConfig(android: CommonExtension): ApkSigningConfig? {
-    val keystorePath = localProperties.getProperty("fileDir") ?: return null
+    val fileDir = project.findProperty("android.injected.signing.store.file") as? String ?: System.getenv("SIGNING_FILE_DIR") ?: localProperties.getProperty("fileDir")
+    val keystorePath = fileDir ?: return null
 
     logger.lifecycle("Using provided signing key")
 
     return android.signingConfigs.create("config").apply {
         storeFile = file(keystorePath)
-        storePassword = localProperties.getProperty("storePassword")
-        keyAlias = localProperties.getProperty("keyAlias")
-        keyPassword = localProperties.getProperty("keyPassword")
+        storePassword = project.findProperty("android.injected.signing.store.password") as? String ?: System.getenv("SIGNING_STORE_PASSWORD") ?: localProperties.getProperty("storePassword")
+        keyAlias = project.findProperty("android.injected.signing.key.alias") as? String ?: System.getenv("SIGNING_KEY_ALIAS") ?: localProperties.getProperty("keyAlias")
+        keyPassword = project.findProperty("android.injected.signing.key.password") as? String ?: System.getenv("SIGNING_KEY_PASSWORD") ?: localProperties.getProperty("keyPassword")
     }
 }
 
