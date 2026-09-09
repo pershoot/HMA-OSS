@@ -135,7 +135,7 @@ class AppPresets private constructor() {
 
                 if (appInfo != null) {
                     try {
-                        if (it.value.addPackageInfoPreset(appInfo!!)) {
+                        if (it.value.addPackageInfoPreset(appInfo)) {
                             onModifyCache(it.key)
                             loggerFunction?.invoke(Log.DEBUG) { "Package $packageName added into ${it.key}!" }
                             addedInAList = true
